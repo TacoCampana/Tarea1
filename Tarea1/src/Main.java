@@ -47,11 +47,14 @@ public class Main {
 
 
         System.out.println("Orden de Compra 1:");
-        System.out.println(orden1);
+        System.out.println("Precio(IVA incluido): $" + compra1.calcPrecioConIVA());
+        System.out.println("IVA total: $" + compra1.calcIVA());
         System.out.println("\nOrden de Compra 2:");
-        System.out.println(orden2);
+        System.out.println("Precio(IVA incluido): $" + orden2.calcPrecioConIVA());
+        System.out.println("IVA total: $" + compra2.calcIVA());
         System.out.println("\nOrden de Compra 3:");
-        System.out.println(orden3);
+        System.out.println("Precio(IVA incluido): $" + orden3.calcPrecioConIVA());
+        System.out.println("IVA total: $" + compra3.calcIVA());
     }
 }
 
@@ -131,7 +134,7 @@ class DetalleOrden {
         return this.articulo.getPrecio() * this.cantidad;
     }
     public float calcPrecioConIVA() {
-        return this.articulo.getPrecio() * this.cantidad - this.calcIVA();
+        return this.articulo.getPrecio() * this.cantidad + this.calcIVA();
     }
     public float calcPeso() {
         return this.articulo.getPeso() * this.cantidad;
@@ -185,16 +188,19 @@ class Pago {
     private String metodo;
     private OrdenCompra oc;
     public Pago(float monto, Date fecha, OrdenCompra oc) {
-        this.monto = oc.calcPrecioConIVA();
+        this.monto = monto;
         this.fecha = oc.getFecha();
         this.metodo = metodo;
-
+        this.oc = oc;
     }
     public Date getFecha() {
         return this.fecha;
     }
     public float getMonto() {
         return this.monto;
+    }
+    public OrdenCompra getOrden() {
+        return this.oc;
     }
     public String toString() {
         return "Método de pago: " + this.metodo + "Total a pagar" + this.monto + "Fecha: " + this.fecha;
@@ -205,7 +211,15 @@ class Efectivo extends Pago {
     public Efectivo(float monto, Date fecha, OrdenCompra oc) {
         super(monto, fecha, oc);
     }
-
+    public float calcDevolucion() {
+        float totalOrden = getOrden().calcPrecioConIVA();
+        if (getMonto() >= totalOrden) {
+            return getMonto() - totalOrden;
+        }
+        else {
+            return 0;
+        }
+    }
 }
 class Transferencia extends Pago {
     private String banco;
