@@ -179,3 +179,4 @@ class Tarjeta extends Pago {
         return this.numTransaccion;
     }
 }
+
