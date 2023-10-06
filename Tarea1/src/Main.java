@@ -86,3 +86,40 @@ class DetalleOrden {
     }
 }
 
+class DocTributario {
+    private String numero;
+    private String rut;
+    private Date fecha;
+    private Direccion direccion;
+    public DocTributario(String numero, String rut, Date fecha, Direccion direccion) {
+        this.numero = numero;
+        this.rut = rut;
+        this.fecha = fecha;
+        this.direccion = direccion;
+    }
+    public String getNumero() {
+        return this.numero;
+    }
+    public String getRut() {
+        return this.rut;
+    }
+    public Date getFecha() {
+        return this.fecha;
+    }
+    public String getDireccion() {
+        return this.direccion.getDireccion();
+    }
+    public String toString() {
+        return "Fecha: " + this.fecha + "\nNro: " + this.numero + "\nRUT: " + this.rut + "\nDirección: " + this.direccion.getDireccion();
+    }
+}
+class Boleta extends DocTributario {
+    public Boleta(String numero, String rut, Date fecha, Direccion direccion) {
+        super(numero, rut, fecha, direccion);
+    }
+}
+class Factura extends DocTributario {
+    public Factura(String numero, String rut, Date fecha, Direccion direccion) {
+        super(numero, rut, fecha, direccion);
+    }
+}
