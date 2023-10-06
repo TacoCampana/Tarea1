@@ -123,3 +123,60 @@ class Factura extends DocTributario {
         super(numero, rut, fecha, direccion);
     }
 }
+
+class Pago {
+    private float monto;
+    private Date fecha;
+    private String metodo;
+    public Pago(float monto, Date fecha,String metodo) {
+        this.monto = monto;
+        this.fecha = fecha;
+        this.metodo = metodo;
+    }
+    public Date getFecha() {
+        return this.fecha;
+    }
+    public float getMonto() {
+        return this.monto;
+    }
+}
+class Efectivo extends Pago {
+
+    public Efectivo(float monto, Date fecha, String metodo) {
+        super(monto, fecha, "Efectivo");
+    }
+    public float calcDevolucion() {
+        //falta completar
+    }
+}
+class Transferencia extends Pago {
+    private String banco;
+    private String numCuenta;
+    public Transferencia(float monto, Date fecha, String metodo, String banco, String numCuenta) {
+        super(monto, fecha, "Transferencia");
+        this.banco = banco;
+        this.numCuenta = numCuenta;
+    }
+    public String getBanco() {
+        return this.banco;
+    }
+    public String getNumCuenta() {
+        return this.numCuenta;
+    }
+}
+class Tarjeta extends Pago {
+    private String tipo;
+    private String numTransaccion;
+    public Tarjeta(float monto, Date fecha, String metodo, String tipo, String numTransaccion) {
+        super(monto, fecha, "Tarjeta");
+        this.tipo = tipo;
+        this.numTransaccion = numTransaccion;
+    }
+    public String getTipo() {
+        return this.tipo;
+    }
+    public String getNumTransaccion() {
+        return this.numTransaccion;
+    }
+}
+
