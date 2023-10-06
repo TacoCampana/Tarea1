@@ -1,3 +1,4 @@
+import javax.print.Doc;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -81,6 +82,9 @@ class DetalleOrden {
     public float calcPrecioConIVA() {
         return this.articulo.getPrecio() * this.cantidad - this.calcIVA();
     }
+    public float calcPeso() {
+        return this.articulo.getPeso() * this.cantidad;
+    }
     public String toString() {
         return "Precio: " + this.calcPrecioConIVA() + "\nIVA: " + this.calcIVA();
     }
@@ -128,10 +132,13 @@ class Pago {
     private float monto;
     private Date fecha;
     private String metodo;
-    public Pago(float monto, Date fecha,String metodo) {
-        this.monto = monto;
-        this.fecha = fecha;
+    private OrdenCompra oc;
+    public Pago(float monto, Date fecha,String metodo, OrdenCompra oc) {
+        this.oc = oc;
+        this.monto = oc.calcPrecioConIVA();
+        this.fecha = oc.getFecha();
         this.metodo = metodo;
+
     }
     public Date getFecha() {
         return this.fecha;
@@ -142,18 +149,19 @@ class Pago {
 }
 class Efectivo extends Pago {
 
-    public Efectivo(float monto, Date fecha, String metodo) {
-        super(monto, fecha, "Efectivo");
+    public Efectivo(float monto, Date fecha, String metodo, OrdenCompra oc) {
+        super(monto, fecha, "Efectivo", oc);
     }
-    public float calcDevolucion() {
-        //falta completar
+
+    public float calcDevolucion(float DineroAbonado) {
+        return DineroAbonado - getMonto();
     }
 }
 class Transferencia extends Pago {
     private String banco;
     private String numCuenta;
-    public Transferencia(float monto, Date fecha, String metodo, String banco, String numCuenta) {
-        super(monto, fecha, "Transferencia");
+    public Transferencia(float monto, Date fecha, String metodo, String banco, String numCuenta, OrdenCompra oc) {
+        super(monto, fecha, "Transferencia", oc);
         this.banco = banco;
         this.numCuenta = numCuenta;
     }
@@ -167,8 +175,8 @@ class Transferencia extends Pago {
 class Tarjeta extends Pago {
     private String tipo;
     private String numTransaccion;
-    public Tarjeta(float monto, Date fecha, String metodo, String tipo, String numTransaccion) {
-        super(monto, fecha, "Tarjeta");
+    public Tarjeta(float monto, Date fecha, String metodo, String tipo, String numTransaccion, OrdenCompra oc) {
+        super(monto, fecha, "Tarjeta", oc);
         this.tipo = tipo;
         this.numTransaccion = numTransaccion;
     }
@@ -180,3 +188,55 @@ class Tarjeta extends Pago {
     }
 }
 
+class OrdenCompra {
+    private Date fecha;
+    private String estado;
+    private Cliente cliente;
+    private ArrayList<DetalleOrden> ordenes;
+    private DocTributario docTributario;
+    private ArrayList<Pago> pagos;
+    public OrdenCompra(Cliente cliente) {
+        this.fecha = new Date();
+        this.estado = "En proceso";
+        this.cliente = cliente;
+        this.ordenes = new ArrayList<>();
+        this.pagos = new ArrayList<>();
+    }
+    public Date getFecha() {
+        return this.fecha;
+    }
+    public void agregarOrden(DetalleOrden detalle) {
+        ordenes.add(detalle);
+    }
+    public void asociarDocTributario(DocTributario docTributario) {
+        this.docTributario = docTributario;
+    }
+    public float calcPrecioSinIVA() {
+        float precio = 0;
+        for(DetalleOrden detalle : ordenes) {
+            precio += detalle.calcPrecioSinIVA();
+        }
+        return precio;
+    }
+    public float calcIVA() {
+        float IVA = 0;
+        for(DetalleOrden detalle : ordenes) {
+            IVA += detalle.calcIVA();
+        }
+        return IVA;
+    }
+    public float calcPrecioConIVA() {
+        float PrecioFinal = 0;
+        for(DetalleOrden detalle : ordenes) {
+            PrecioFinal += detalle.calcPrecioConIVA();
+        }
+        return PrecioFinal;
+    }
+    public float CalcPeso() {
+        float PesoTotal = 0;
+        for(DetalleOrden detalle : ordenes) {
+            PesoTotal += detalle.calcPeso();
+        }
+        return PesoTotal;
+    }
+}
