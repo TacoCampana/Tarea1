@@ -1,4 +1,3 @@
-import javax.print.Doc;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -86,7 +85,7 @@ class DetalleOrden {
         return this.articulo.getPeso() * this.cantidad;
     }
     public String toString() {
-        return "Precio: " + this.calcPrecioConIVA() + "\nIVA: " + this.calcIVA();
+        return "Artículo: " + this.articulo + " x " + this.cantidad + "\nPrecio: " + this.calcPrecioConIVA() + " IVA: " + this.calcIVA() + "\nPeso: " + this.calcPeso();
     }
 }
 
@@ -145,6 +144,9 @@ class Pago {
     }
     public float getMonto() {
         return this.monto;
+    }
+    public String toString() {
+        return "Método de pago: " + this.metodo + "Total a pagar" + this.monto + "Fecha: " + this.fecha;
     }
 }
 class Efectivo extends Pago {
