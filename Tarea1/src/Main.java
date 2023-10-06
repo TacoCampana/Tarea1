@@ -3,6 +3,55 @@ import java.util.Date;
 
 public class Main {
     public static void main(String[] args) {
+        Cliente cliente1 = new Cliente("Cliente 1", "12345", new Direccion("Calle 1"));
+        Cliente cliente2 = new Cliente("Cliente 2", "67890", new Direccion("Calle 2"));
+
+        Articulo articulo1 = new Articulo("Artículo 1", "Descripción 1", 1.5F, 10.0F);
+        Articulo articulo2 = new Articulo("Artículo 2", "Descripción 2", 2.0F, 15.0F);
+        Articulo articulo3 = new Articulo("Artículo 3", "Descripción 3", 0.5F, 5.0F);
+        Articulo articulo4 = new Articulo("Artículo 4", "Descripción 4", 1.0F, 20.0F);
+        Articulo articulo5 = new Articulo("Artículo 5", "Descripción 5", 0.8F, 12.0F);
+
+        OrdenCompra compra1 = new OrdenCompra(cliente1);
+        OrdenCompra compra2 = new OrdenCompra(cliente2);
+        OrdenCompra compra3 = new OrdenCompra(cliente1);
+
+        DetalleOrden orden1 = new DetalleOrden(articulo1, 2);
+        DetalleOrden orden2 = new DetalleOrden(articulo2, 3);
+        DetalleOrden orden3 = new DetalleOrden(articulo3, 4);
+        DetalleOrden orden4 = new DetalleOrden(articulo4, 1);
+        DetalleOrden orden5 = new DetalleOrden(articulo5, 2);
+
+        compra1.agregarOrden(orden1);
+        compra1.agregarOrden(orden2);
+        compra2.agregarOrden(orden3);
+        compra3.agregarOrden(orden4);
+        compra3.agregarOrden(orden5);
+
+        DocTributario boleta1 = new Boleta("12345-1", cliente1.getRut(), compra1.getFecha(), cliente1.getDireccion());
+        DocTributario factura1 = new Factura("67890-1", cliente2.getRut(), compra2.getFecha(), cliente2.getDireccion());
+
+        compra1.asociarDocTributario(boleta1);
+        compra2.asociarDocTributario(factura1);
+        compra3.asociarDocTributario(boleta1);
+
+        Pago pago1 = new Efectivo(50.0F, compra1.getFecha(), compra1);
+        Pago pago2 = new Transferencia(30.0F, compra3.getFecha(), "BancoEstado", "43457423", compra3);
+        Pago pago3 = new Tarjeta(25.0F, compra2.getFecha(), "Visa", "8274923", compra2);
+        Pago pago4 = new Efectivo(15.0F, compra1.getFecha(), compra1);
+
+        compra1.agregarPago(pago1);
+        compra1.agregarPago(pago2);
+        compra2.agregarPago(pago3);
+        compra3.agregarPago(pago4);
+
+
+        System.out.println("Orden de Compra 1:");
+        System.out.println(orden1);
+        System.out.println("\nOrden de Compra 2:");
+        System.out.println(orden2);
+        System.out.println("\nOrden de Compra 3:");
+        System.out.println(orden3);
     }
 }
 
@@ -21,6 +70,9 @@ class Cliente {
     }
     public String getRut() {
         return this.rut;
+    }
+    public Direccion getDireccion() {
+        return this.direccion;
     }
     public String toString() {
         return this.nombre + " RUT: " + this.rut + " Dirección: " + this.direccion;
@@ -109,8 +161,8 @@ class DocTributario {
     public Date getFecha() {
         return this.fecha;
     }
-    public String getDireccion() {
-        return this.direccion.getDireccion();
+    public Direccion getDireccion() {
+        return this.direccion;
     }
     public String toString() {
         return "Fecha: " + this.fecha + "\nNro: " + this.numero + "\nRUT: " + this.rut + "\nDirección: " + this.direccion.getDireccion();
@@ -132,8 +184,7 @@ class Pago {
     private Date fecha;
     private String metodo;
     private OrdenCompra oc;
-    public Pago(float monto, Date fecha,String metodo, OrdenCompra oc) {
-        this.oc = oc;
+    public Pago(float monto, Date fecha, OrdenCompra oc) {
         this.monto = oc.calcPrecioConIVA();
         this.fecha = oc.getFecha();
         this.metodo = metodo;
@@ -151,19 +202,16 @@ class Pago {
 }
 class Efectivo extends Pago {
 
-    public Efectivo(float monto, Date fecha, String metodo, OrdenCompra oc) {
-        super(monto, fecha, "Efectivo", oc);
+    public Efectivo(float monto, Date fecha, OrdenCompra oc) {
+        super(monto, fecha, oc);
     }
 
-    public float calcDevolucion(float DineroAbonado) {
-        return DineroAbonado - getMonto();
-    }
 }
 class Transferencia extends Pago {
     private String banco;
     private String numCuenta;
-    public Transferencia(float monto, Date fecha, String metodo, String banco, String numCuenta, OrdenCompra oc) {
-        super(monto, fecha, "Transferencia", oc);
+    public Transferencia(float monto, Date fecha, String banco, String numCuenta, OrdenCompra oc) {
+        super(monto, fecha, oc);
         this.banco = banco;
         this.numCuenta = numCuenta;
     }
@@ -177,8 +225,8 @@ class Transferencia extends Pago {
 class Tarjeta extends Pago {
     private String tipo;
     private String numTransaccion;
-    public Tarjeta(float monto, Date fecha, String metodo, String tipo, String numTransaccion, OrdenCompra oc) {
-        super(monto, fecha, "Tarjeta", oc);
+    public Tarjeta(float monto, Date fecha, String tipo, String numTransaccion, OrdenCompra oc) {
+        super(monto, fecha, oc);
         this.tipo = tipo;
         this.numTransaccion = numTransaccion;
     }
@@ -212,6 +260,9 @@ class OrdenCompra {
     }
     public void asociarDocTributario(DocTributario docTributario) {
         this.docTributario = docTributario;
+    }
+    public void agregarPago(Pago pago) {
+        pagos.add(pago);
     }
     public float calcPrecioSinIVA() {
         float precio = 0;
